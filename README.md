@@ -23,8 +23,6 @@ implicit def closer[R <: Closeable]: Closer[R] = Closer { x =>
 } yield {
   var line = buff.readLine()
   while (line != null) {
-    println(line)
-
     writer.write(line + "\n")
     line = buff.readLine()
   }
