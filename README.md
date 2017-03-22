@@ -10,9 +10,7 @@ $ sbt run
 ## Example codes
 
 ```scala
-implicit def closer[R <: Closeable]: Closer[R] = Closer { x =>
-  x.close()
-}
+implicit def closer[R <: Closeable]: Closer[R] = Closer(_.close())
 
 (for {
   in     <- Close(new FileInputStream(getClass.getResource("/source.txt").getPath))

@@ -16,7 +16,7 @@ object Main {
       out    <- Close(new FileOutputStream("dest.txt"))
       writer <- Close(new OutputStreamWriter(out, "UTF-8"))
     } yield {
-      println("begin")
+      println("[begin]")
 
       var line = buff.readLine()
       while (line != null) {
@@ -26,7 +26,7 @@ object Main {
         line = buff.readLine()
       }
 
-      println("end")
+      println("[end]")
     }
 
     a.run()
