@@ -1,6 +1,5 @@
 import java.io._
-import close.Close
-import close.Closer
+import close.{Close, Closer}
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -28,7 +27,10 @@ object Main {
 
       println("[end]")
     }
-
     a.run()
+
+    println("[single]")
+    Close(new FileInputStream(getClass.getResource("/source.txt").getPath)).run()
+    println("[end]")
   }
 }
