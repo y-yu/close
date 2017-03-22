@@ -40,12 +40,12 @@ object CloseTestHelper {
     Gen.frequency(
       1 -> E.map[Close[R, A]] { e =>
         new Close[R, A](R.sample()) {
-          def process()(implicit closer: Closer[R]): A = throw e
+          def run()(implicit closer: Closer[R]): A = throw e
         }
       },
       2 -> A.map[Close[R, A]] { a =>
         new Close[R, A](R.sample()) {
-          def process()(implicit closer: Closer[R]): A = a
+          def run()(implicit closer: Closer[R]): A = a
         }
       }
     )

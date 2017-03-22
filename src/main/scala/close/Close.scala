@@ -1,15 +1,12 @@
 package close
 
 abstract class Close[+R, +A](res: R) { self =>
-  def process()(implicit closer: Closer[R]): A
-
-  def run()(implicit closer: Closer[R]): A =
-    self.process()
+  def run()(implicit closer: Closer[R]): A
 
   def flatMap[AR >: R, B](f: A => Close[AR, B]): Close[AR, B] = new Close[AR, B](res) {
-    def process()(implicit closer: Closer[AR]): B =
+    def run()(implicit closer: Closer[AR]): B =
       try {
-        f(self.process()).process()
+        f(self.run()).run()
       } finally {
         closer.close(res)
       }
@@ -20,7 +17,7 @@ abstract class Close[+R, +A](res: R) { self =>
 
 object Close {
   def apply[R, A](res: R, a: => A) = new Close[R, A](res) {
-    def process()(implicit closer: Closer[R]): A = a
+    def run()(implicit closer: Closer[R]): A = a
   }
 
   def apply[R](r: R): Close[R, R] = apply(r, r)
