@@ -1,4 +1,4 @@
-name := "io-close"
+name := "close"
 
 version := "1.0"
 

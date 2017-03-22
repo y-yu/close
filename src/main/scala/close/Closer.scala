@@ -1,6 +1,6 @@
 package close
 
-trait Closer[A] {
+trait Closer[-A] {
   def close(a: A): Unit
 }
 

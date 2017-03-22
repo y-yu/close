@@ -1,22 +1,27 @@
 package close
 
-trait Close[R, A] { self =>
-  def process(res: A): A
+abstract class Close[+R, +A](res: R) { self =>
+  def process()(implicit closer: Closer[R]): A
 
-  def flatMap[B](f: A => Close[R, B]): Close[R, B] = new Close[R, B] {
-    def process(res: B): B =
+  def run()(implicit closer: Closer[R]): A =
+    self.process()
+
+  def flatMap[AR >: R, B](f: A => Close[AR, B]): Close[AR, B] = new Close[AR, B](res) {
+    def process()(implicit closer: Closer[AR]): B =
       try {
-        f(self.process(res)).process(res)
+        f(self.process()).process()
       } finally {
         closer.close(res)
       }
   }
 
-  def map[B](f: A => B): Close[B] = flatMap(x => Close(f(x)))
+  def map[B](f: A => B): Close[R, B] = flatMap(x => Close(res, f(x)))
 }
 
 object Close {
-  def apply[A](a: => A): Close[A] = new Close[A] {
-    def process[R](res: R)(implicit closer: Closer[R]): A = a
+  def apply[R, A](res: R, a: => A) = new Close[R, A](res) {
+    def process()(implicit closer: Closer[R]): A = a
   }
+
+  def apply[R](r: R): Close[R, R] = apply(r, r)
 }
