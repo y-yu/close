@@ -1,6 +1,8 @@
 Close Monad
 ==================
 
+[![Build Status](https://travis-ci.org/y-yu/close.svg?branch=master)](https://travis-ci.org/y-yu/close)
+
 ## How to use
 
 ```
