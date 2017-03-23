@@ -1,7 +1,5 @@
 package close
 
-import java.io.Closeable
-import java.io.FileInputStream
 import scalaprops.Gen
 import scalaz.Equal
 import scala.util.Failure
@@ -9,7 +7,7 @@ import scala.util.Success
 import scala.util.Try
 
 object CloseTestHelper {
-  implicit val genFileInputStream: Gen[FileInputStream] = Gen.value(new FileInputStream(getClass.getResource("/test.txt").getPath))
+  implicit val genFileInputStream: Gen[TestCloseable] = Gen.value(TestCloseable())
 
   case class Error(value: Int) extends Exception(s"message: ${value.toString}")
 
@@ -19,14 +17,10 @@ object CloseTestHelper {
   implicit def equalError(implicit I: Equal[Int]): Equal[Error] =
     I.contramap(_.value)
 
-  implicit def genCloser[A <: Closeable](implicit A: Gen[A]): Gen[Closer[A]] =
-    A.map[Closer[A]] {
-      r => new Closer[A] {
-        def close(r: A): Unit = r.close()
-      }
-    }
+  implicit def genCloser[A <: TestCloseable](implicit A: Gen[A]): Gen[TestCloser[A]] =
+    A.map[TestCloser[A]](_ => new TestCloser[A])
 
-  implicit def equalClose[R, A](implicit A: Equal[A], E: Equal[Error], C: Gen[Closer[R]]): Equal[Close[R, A]] =
+  implicit def equalClose[R, A](implicit A: Equal[A], E: Equal[Error], C: Gen[TestCloser[R]]): Equal[Close[R, A]] =
     Equal.equal { (a, b) =>
       val c = C.sample()
       (Try(a.run()(c)), Try(b.run()(c))) match {
