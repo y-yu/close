@@ -4,9 +4,14 @@ import java.io.Closeable
 import scalaprops.Property.forAll
 import scalaprops._
 
-case class TestCloseable() extends Closeable {
+trait TestCloseable extends Closeable {
+  val id: Int
   def close(): Unit = ()
 }
+
+class ConcreteTestCloseable1(val id: Int) extends TestCloseable
+
+class ConcreteTestCloseable2(val id: Int) extends TestCloseable
 
 class TestCloser[A] extends Closer[A] {
   val closedOrder: scala.collection.mutable.ArrayBuffer[A] = scala.collection.mutable.ArrayBuffer.empty[A]
@@ -21,10 +26,8 @@ object CloseTest extends Scalaprops {
   import scalaz.std.anyVal._
   import CloseTestHelper._
 
-  implicit val testCloseable: TestCloseable = TestCloseable()
-
-  implicit def closeMonadInstance[R, A](implicit r: R) = new Monad[({type L[B] = Close[R, B]})#L] {
-    def point[B](a: => B): Close[R, B] = Close[R, B](r, a)
+  implicit def closeMonadInstance[R, A](implicit r: Gen[R]) = new Monad[({type L[B] = Close[R, B]})#L] {
+    def point[B](a: => B): Close[R, B] = Close[R, B](r.sample(), a)
     def bind[B, C](a: Close[R, B])(f: B => Close[R, C]): Close[R, C] = a.flatMap(f)
   }
 
