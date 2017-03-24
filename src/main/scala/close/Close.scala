@@ -1,6 +1,6 @@
 package close
 
-abstract class Close[+R, +A](res: => R) { self =>
+abstract class Close[+R, +A](res: R) { self =>
   protected def process()(implicit closer: Closer[R]): A
 
   def run()(implicit closer: Closer[R]): A =
@@ -26,9 +26,9 @@ abstract class Close[+R, +A](res: => R) { self =>
 }
 
 object Close {
-  def apply[R, A](res: => R, a: => A) = new Close[R, A](res) {
+  def apply[R, A](res: R, a: => A) = new Close[R, A](res) {
     def process()(implicit closer: Closer[R]): A = a
   }
 
-  def apply[R](r: => R): Close[R, R] = apply(r, r)
+  def apply[R](res: R): Close[R, R] = apply(res, res)
 }
