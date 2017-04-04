@@ -3,6 +3,8 @@ Close Monad
 
 [![Build Status](https://travis-ci.org/y-yu/close.svg?branch=master)](https://travis-ci.org/y-yu/close)
 
+**This is an experimental implementation. I suggest that you should not use in production!**
+
 ## How to use
 
 ```
